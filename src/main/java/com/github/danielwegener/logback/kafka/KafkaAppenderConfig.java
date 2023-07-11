@@ -11,8 +11,6 @@ import com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.kafka.clients.producer.ProducerConfig.*;
-
 /**
  * @since 0.0.1
  */
@@ -33,15 +31,15 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
     protected boolean checkPrerequisites() {
         boolean errorFree = true;
 
-        if (producerConfig.get(BOOTSTRAP_SERVERS_CONFIG) == null) {
-            addError("No \"" + BOOTSTRAP_SERVERS_CONFIG + "\" set for the appender named [\""
-                    + name + "\"].");
-            errorFree = false;
-        }
+//        if (producerConfig.get(BOOTSTRAP_SERVERS_CONFIG) == null) {
+//            addError("No \"" + BOOTSTRAP_SERVERS_CONFIG + "\" set for the appender named [\""
+//                    + name + "\"].");
+//            errorFree = false;
+//        }
 
         if (topic == null) {
-            addError("No topic set for the appender named [\"" + name + "\"].");
-            errorFree = false;
+            addInfo("No topic set for the appender named [\"" + name + "\"]. Using default-log");
+            topic = "default-log";
         }
 
         if (encoder == null) {
@@ -76,8 +74,9 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
 
     public void addProducerConfig(String keyValue) {
         String[] split = keyValue.split("=", 2);
-        if(split.length == 2)
+        if(split.length == 2) {
             addProducerConfigValue(split[0], split[1]);
+        }
     }
 
     public void addProducerConfigValue(String key, Object value) {

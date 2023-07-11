@@ -53,7 +53,7 @@
         <!-- ensure that every message sent by the executing host is partitioned to the same partition strategy -->
         <keyingStrategy class="com.github.danielwegener.logback.kafka.keying.HostNameKeyingStrategy" />
         <!-- block the logging application thread if the kafka appender cannot keep up with sending the log messages -->
-        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.BlockingDeliveryStrategy">
+        <deliveryStrategy class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy">
             <!-- wait indefinitely until the kafka producer was able to send the message -->
             <timeout>0</timeout>
         </deliveryStrategy>

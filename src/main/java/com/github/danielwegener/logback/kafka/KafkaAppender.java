@@ -3,6 +3,7 @@ package com.github.danielwegener.logback.kafka;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.spi.AppenderAttachableImpl;
+import com.github.danielwegener.logback.kafka.config.PropertiesHolder;
 import com.github.danielwegener.logback.kafka.delivery.FailedDeliveryCallback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -44,8 +45,14 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
 
     @Override
     public void doAppend(E e) {
+
+        // hide
+        if (PropertiesHolder.propertiesCanUse() && PropertiesHolder.getProperties().isHideSelf()) {
+            return;
+        }
+
         ensureDeferredAppends();
-        if (e instanceof ILoggingEvent && ((ILoggingEvent)e).getLoggerName().startsWith(KAFKA_LOGGER_PREFIX)) {
+        if (e instanceof ILoggingEvent && ((ILoggingEvent) e).getLoggerName().startsWith(KAFKA_LOGGER_PREFIX)) {
             deferAppend(e);
         } else {
             super.doAppend(e);
@@ -55,7 +62,9 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
     @Override
     public void start() {
         // only error free appenders should be activated
-        if (!checkPrerequisites()) return;
+        if (!checkPrerequisites()) {
+            return;
+        }
 
         if (partition != null && partition < 0) {
             partition = null;
@@ -140,6 +149,9 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
     }
 
     protected Producer<byte[], byte[]> createProducer() {
+        if (PropertiesHolder.propertiesCanUse()) {
+            producerConfig.putAll(PropertiesHolder.getProperties().getProducer());
+        }
         return new KafkaProducer<>(new HashMap<>(producerConfig));
     }
 
@@ -168,9 +180,9 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
         public Producer<byte[], byte[]> get() {
             Producer<byte[], byte[]> result = this.producer;
             if (result == null) {
-                synchronized(this) {
+                synchronized (this) {
                     result = this.producer;
-                    if(result == null) {
+                    if (result == null && PropertiesHolder.propertiesCanUse()) {
                         this.producer = result = this.initialize();
                     }
                 }
@@ -189,7 +201,9 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
             return producer;
         }
 
-        public boolean isInitialized() { return producer != null; }
+        public boolean isInitialized() {
+            return producer != null;
+        }
     }
 
 }
