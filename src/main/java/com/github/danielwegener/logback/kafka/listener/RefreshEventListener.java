@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
+import com.github.danielwegener.logback.kafka.FallbackAppender;
 import com.github.danielwegener.logback.kafka.config.PropertiesHolder;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -70,6 +71,14 @@ public class RefreshEventListener implements SmartApplicationListener {
             Set<String> add2Current = lastHideAppender.stream().filter(e -> !hideAppender.contains(e)).collect(Collectors.toSet());
 
             loggerList.forEach(logger -> {
+                Iterator<Appender<ILoggingEvent>> iterator = logger.iteratorForAppenders();
+                while (iterator.hasNext()) {
+                    Appender<ILoggingEvent> appender = iterator.next();
+                    appenderNameMap.put(appender.getName(), appender);
+                    if (FallbackAppender.isUnInitialize() && FallbackAppender.hit(appender.getName())) {
+                        FallbackAppender.setAppender(appender);
+                    }
+                }
                 for (String appenderName : removeFromCurrent) {
                     Appender<ILoggingEvent> appender = logger.getAppender(appenderName);
                     if (appender == null) {
@@ -93,6 +102,8 @@ public class RefreshEventListener implements SmartApplicationListener {
                     logger.addAppender(appenderNameMap.get(appenderName));
                 }
             });
+            lastHideAppender.clear();
+            lastHideAppender.addAll(hideAppender);
         }
     }
 

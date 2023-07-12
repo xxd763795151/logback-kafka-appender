@@ -33,7 +33,11 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
     private final FailedDeliveryCallback<E> failedDeliveryCallback = new FailedDeliveryCallback<E>() {
         @Override
         public void onFailedDelivery(E evt, Throwable throwable) {
-            aai.appendLoopOnAppenders(evt);
+//            aai.appendLoopOnAppenders(evt);
+            if (evt instanceof ILoggingEvent) {
+
+                FallbackAppender.append((ILoggingEvent) evt);
+            }
         }
     };
 

@@ -6,7 +6,7 @@ import ch.qos.logback.core.spi.AppenderAttachable;
 import com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy;
 import com.github.danielwegener.logback.kafka.delivery.DeliveryStrategy;
 import com.github.danielwegener.logback.kafka.keying.KeyingStrategy;
-import com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy;
+import com.github.danielwegener.logback.kafka.keying.ThreadNameKeyingStrategy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,9 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
 
     protected boolean appendTimestamp = true;
 
-    protected Map<String,Object> producerConfig = new HashMap<String, Object>();
+    protected String fallbackAppender;
+
+    protected Map<String, Object> producerConfig = new HashMap<String, Object>();
 
     protected boolean checkPrerequisites() {
         boolean errorFree = true;
@@ -49,11 +51,11 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
 
         if (keyingStrategy == null) {
             addInfo("No explicit keyingStrategy set for the appender named [\"" + name + "\"]. Using default NoKeyKeyingStrategy.");
-            keyingStrategy = new NoKeyKeyingStrategy();
+            keyingStrategy = (KeyingStrategy<? super E>) new ThreadNameKeyingStrategy();
         }
 
         if (deliveryStrategy == null) {
-            addInfo("No explicit deliveryStrategy set for the appender named [\""+name+"\"]. Using default asynchronous strategy.");
+            addInfo("No explicit deliveryStrategy set for the appender named [\"" + name + "\"]. Using default asynchronous strategy.");
             deliveryStrategy = new AsynchronousDeliveryStrategy();
         }
 
@@ -74,13 +76,13 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
 
     public void addProducerConfig(String keyValue) {
         String[] split = keyValue.split("=", 2);
-        if(split.length == 2) {
+        if (split.length == 2) {
             addProducerConfigValue(split[0], split[1]);
         }
     }
 
     public void addProducerConfigValue(String key, Object value) {
-        this.producerConfig.put(key,value);
+        this.producerConfig.put(key, value);
     }
 
     public Map<String, Object> getProducerConfig() {
@@ -103,4 +105,8 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
         this.appendTimestamp = appendTimestamp;
     }
 
+    public void setFallbackAppender(String fallbackAppender) {
+        this.fallbackAppender = fallbackAppender;
+        FallbackAppender.name = fallbackAppender;
+    }
 }
