@@ -1,11 +1,12 @@
 package com.github.danielwegener.logback.kafka.config;
 
-import com.github.danielwegener.logback.kafka.listener.RefreshEventListener;
+import com.github.danielwegener.logback.kafka.listener.LoggerConfigRefreshEventListener;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.env.Environment;
 
 /**
  * @author: xuxd
@@ -16,8 +17,9 @@ public class KafkaAppenderConfiguration {
 
     @Bean
     @ConfigurationProperties(prefix = "logback.kafka")
-    public KafkaAppendProperties kafkaProperties() {
+    public KafkaAppendProperties kafkaProperties(Environment environment) {
         KafkaAppendProperties kafkaAppendProperties = new KafkaAppendProperties();
+        kafkaAppendProperties.setAppName(environment.getProperty("spring.application.name"));
         kafkaAppendProperties.setDiscoverConfig(true);
         return kafkaAppendProperties;
     }
@@ -29,8 +31,8 @@ public class KafkaAppenderConfiguration {
     }
 
     @Bean
-    public RefreshEventListener refreshEventListener() {
-        return new RefreshEventListener();
+    public LoggerConfigRefreshEventListener loggerConfigRefreshEventListener() {
+        return new LoggerConfigRefreshEventListener();
     }
 
     @Bean

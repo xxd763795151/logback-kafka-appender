@@ -17,6 +17,8 @@ public class KafkaAppendProperties {
 
     private boolean hideSelf;
 
+    private String appName;
+
     private Properties producer = new Properties();
 
     public Map<String, Object> getProducer() {
@@ -62,13 +64,22 @@ public class KafkaAppendProperties {
         this.hideSelf = hideSelf;
     }
 
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
     @Override
     public String toString() {
-        return "KafkaProperties{" +
+        return "KafkaAppendProperties{" +
             "fallbackAppender='" + fallbackAppender + '\'' +
             ", discoverConfig=" + discoverConfig +
             ", hideAppender=" + hideAppender +
             ", hideSelf=" + hideSelf +
+            ", appName='" + appName + '\'' +
             ", producer=" + producer +
             '}';
     }

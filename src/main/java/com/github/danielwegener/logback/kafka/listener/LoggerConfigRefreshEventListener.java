@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @author: xuxd
  * @date: 2023/7/10 14:45
  **/
-public class RefreshEventListener implements SmartApplicationListener {
+public class LoggerConfigRefreshEventListener implements SmartApplicationListener {
 
 
     private Set<String> lastHideAppender = new HashSet<>();
@@ -54,7 +54,7 @@ public class RefreshEventListener implements SmartApplicationListener {
 
         Set<String> hideAppender = PropertiesHolder.getProperties().getHideAppender();
 
-        synchronized (RefreshEventListener.class) {
+        synchronized (LoggerConfigRefreshEventListener.class) {
             // only process one of them.
             if (event instanceof LoggerCheckEvent) {
                 boolean hasChange = checkAppenderHasChange(loggerList);
