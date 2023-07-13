@@ -18,6 +18,9 @@ public class PropertiesHolder {
     }
 
     public static boolean propertiesCanUse() {
-        return properties != null && properties.isDiscoverConfig();
+        return properties != null
+            && properties.getProducer() != null
+            && !properties.getProducer().isEmpty()
+            && properties.isDiscoverConfig();
     }
 }
