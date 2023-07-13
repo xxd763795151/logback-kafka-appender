@@ -1,9 +1,13 @@
 package com.github.danielwegener.logback.kafka;
 
+import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.spi.AppenderAttachableImpl;
 import com.github.danielwegener.logback.kafka.config.PropertiesHolder;
+import com.github.danielwegener.logback.kafka.convert.HostConverter;
+import com.github.danielwegener.logback.kafka.convert.ProcessIdConverter;
+import com.github.danielwegener.logback.kafka.convert.ServiceNameConverter;
 import com.github.danielwegener.logback.kafka.delivery.FailedDeliveryCallback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -210,4 +214,12 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
         }
     }
 
+    static {
+        PatternLayout.defaultConverterMap.put("h", HostConverter.class.getName());
+        PatternLayout.defaultConverterMap.put("host", HostConverter.class.getName());
+        PatternLayout.defaultConverterMap.put("pid", ProcessIdConverter.class.getName());
+        PatternLayout.defaultConverterMap.put("processId", ProcessIdConverter.class.getName());
+        PatternLayout.defaultConverterMap.put("sn", ServiceNameConverter.class.getName());
+        PatternLayout.defaultConverterMap.put("serviceName", ServiceNameConverter.class.getName());
+    }
 }
