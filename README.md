@@ -99,7 +99,7 @@ logback配置
 [src/main/resources/application.yml]
 logback:
     kafka:
-        # 是否印到kafka
+        # 是否允许输出日志到kafka，false是不允许
         hide-self: false
         # 隐藏appender，不要隐藏自己，通过上面的hide-self来控制自身打印行为
         hide-appender:
@@ -110,7 +110,7 @@ logback:
             bootstrap.servers: localhost:9092
             linger.ms: 3000
             acks: 0
-            batch.size: 5000
+            batch.size: 524288
 ```
 
 ## FAQ
