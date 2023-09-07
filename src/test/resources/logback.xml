@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 日志目录   -->
+    <property name="LOG_HOME" value="${user.dir}/logs"/>
+    <!--    日志文件名-->
+    <property name="APP_NAME" value="demo"/>
+
+    <!--    使用默认的输出格式-->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <appender name="DefaultAppender"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>3</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+    </appender>
+    <!--    异步输出-->
+    <appender name="AsyncFileAppender" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="DefaultAppender"/>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+    <!-- 日志信息发送kafka -->
+    <appender name="KafkaAppender" class="com.github.danielwegener.logback.kafka.KafkaAppender">
+        <encoder>
+            <!--            <pattern>-->
+            <!--                {-->
+            <!--                "service":"demo",-->
+            <!--                "date":"%d{yyyy-MM-dd HH:mm:ss}",-->
+            <!--                "level":"%level",-->
+            <!--                "thread": "%thread",-->
+            <!--                "logger": "%logger{36}",-->
+            <!--                "msg":"%msg"-->
+            <!--                }-->
+            <!--            </pattern>-->
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+        <fallbackAppender>AsyncFileAppender</fallbackAppender>
+    </appender>
+
+    <appender name="AsyncKafkaAppender" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="KafkaAppender"/>
+    </appender>
+
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="AsyncFileAppender"/>
+        <appender-ref ref="AsyncKafkaAppender"/>
+    </root>
+</configuration>
